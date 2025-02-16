@@ -140,13 +140,62 @@
 			"prefix": "app-shell",
 			"architect": {
 				"build": {
+					"builder": "@angular-architects/native-federation:build",
+					"options": {
+						"ssr": true
+					},
+					"configurations": {
+						"production": {
+							"target": "todo:esbuild:production"
+						},
+						"development": {
+							"target": "todo:esbuild:development",
+							"dev": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular-architects/native-federation:build",
+					"options": {
+						"target": "todo:serve-original:development",
+						"rebuildDelay": 0,
+						"dev": true,
+						"port": 0
+					}
+				},
+				"extract-i18n": {
+					"builder": "@angular-devkit/build-angular:extract-i18n"
+				},
+				"test": {
+					"builder": "@angular-devkit/build-angular:karma",
+					"options": {
+						"polyfills": [
+							"zone.js",
+							"zone.js/testing"
+						],
+						"tsConfig": "projects/todo/tsconfig.spec.json",
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/todo/public"
+							}
+						],
+						"styles": [
+							"projects/todo/src/styles.css"
+						],
+						"scripts": []
+					}
+				},
+				"esbuild": {
 					"builder": "@angular-devkit/build-angular:application",
 					"options": {
 						"outputPath": "dist/todo",
 						"index": "projects/todo/src/index.html",
 						"browser": "projects/todo/src/main.ts",
 						"polyfills": [
-							"zone.js"
+							"zone.js",
+							"es-module-shims"
 						],
 						"tsConfig": "projects/todo/tsconfig.app.json",
 						"assets": [
@@ -160,7 +209,7 @@
 						],
 						"scripts": [],
 						"server": "projects/todo/src/main.server.ts",
-						"prerender": true,
+						"prerender": false,
 						"ssr": {
 							"entry": "projects/todo/src/server.ts"
 						}
@@ -189,39 +238,19 @@
 					},
 					"defaultConfiguration": "production"
 				},
-				"serve": {
+				"serve-original": {
 					"builder": "@angular-devkit/build-angular:dev-server",
 					"configurations": {
 						"production": {
-							"buildTarget": "todo:build:production"
+							"buildTarget": "todo:esbuild:production"
 						},
 						"development": {
-							"buildTarget": "todo:build:development"
+							"buildTarget": "todo:esbuild:development"
 						}
 					},
-					"defaultConfiguration": "development"
-				},
-				"extract-i18n": {
-					"builder": "@angular-devkit/build-angular:extract-i18n"
-				},
-				"test": {
-					"builder": "@angular-devkit/build-angular:karma",
+					"defaultConfiguration": "development",
 					"options": {
-						"polyfills": [
-							"zone.js",
-							"zone.js/testing"
-						],
-						"tsConfig": "projects/todo/tsconfig.spec.json",
-						"assets": [
-							{
-								"glob": "**/*",
-								"input": "projects/todo/public"
-							}
-						],
-						"styles": [
-							"projects/todo/src/styles.css"
-						],
-						"scripts": []
+						"port": 4201
 					}
 				}
 			}
